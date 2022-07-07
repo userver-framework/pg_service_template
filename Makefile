@@ -24,12 +24,12 @@ build_release/Makefile:
 
 # build using cmake
 build-impl-%: build_%/Makefile
-	@cmake --build build_$* -j $(NPROCS) --target service_template
+	@cmake --build build_$* -j $(NPROCS) --target pg_service_template
 
 # test
 test-impl-%: build-impl-%
-	@cmake --build build_$* -j $(NPROCS) --target service_template_unittest
-	@cmake --build build_$* -j $(NPROCS) --target service_template_benchmark
+	@cmake --build build_$* -j $(NPROCS) --target pg_service_template_unittest
+	@cmake --build build_$* -j $(NPROCS) --target pg_service_template_benchmark
 	@cd build_$* && ((test -t 1 && GTEST_COLOR=1 PYTEST_ADDOPTS="--color=yes" ctest -V) || ctest -V)
 	@pep8 tests
 
@@ -52,7 +52,7 @@ format:
 
 install: build-release
 	@cd build_release && \
-		cmake --install . -v --component service_template
+		cmake --install . -v --component pg_service_template
 
 # Explicitly specifying the targets to help shell with completions
 cmake-debug: build_debug/Makefile

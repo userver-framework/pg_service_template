@@ -1,6 +1,6 @@
-# service_template
+# pg_service_template
 
-Template of a C++ service that uses [userver framework](https://github.com/userver-framework/userver).
+Template of a C++ service that uses [userver framework](https://github.com/userver-framework/userver) with PostgreSQL.
 
 
 ## Download and Build
@@ -9,7 +9,8 @@ To create your own userver-based service follow the following steps:
 
 1. Press the green "Use this template button" at the top of this github page
 2. Clone the service `git clone your-service-repo && cd your-service-repo && git submodule update --init`
-3. Give a propper name to your service and replace all the occurences of "service_template" string with that name
+3. Give a propper name to your service and replace all the occurences of "pg_service_template" string with that name
+   (could be done via `find . -not -path "./third_party/*" -not -path ".git/*" -not -path './build_*' -type f | xargs sed -i 's/pg_service_template/YOUR_SERVICE_NAME/g'`).
 4. Feel free to tweak, adjust or fully rewrite the source code of your service.
 
 
