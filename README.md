@@ -1,6 +1,6 @@
 # service_template
 
-Template of a C++ service that uses [userver framework](https://github.com/userver-framework/userver).
+Template of a C++ service that uses [userver framework](https://github.com/userver-framework/userver) with PostgreSQL.
 
 
 ## Download and Build
