@@ -63,15 +63,15 @@ jobs:
           - name: Test run after install
             if: matrix.make == 'test-release'
             run: |
-                ./local_installation/bin/service_template --config=./local_installation/etc/service_template/static_config.yaml &
+                ./local_installation/bin/pg_service_template --config=./local_installation/etc/pg_service_template/static_config.yaml &
 
           - name: Check work run service
             if: matrix.make == 'test-release'
             run: |
-                ps aux | grep service_template | grep config && curl http://localhost:8080/ping -v
+                ps aux | grep pg_service_template | grep config && curl http://localhost:8080/ping -v
 
           - name: Stop all
             if: matrix.make == 'test-release'
             run: |
-                killall service_template
+                killall pg_service_template
 
