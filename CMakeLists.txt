@@ -10,7 +10,7 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/hello.hpp
     src/hello.cpp
 )
-target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core)
+target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core userver-postgresql)
 
 
 # The Service

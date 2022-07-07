@@ -3,6 +3,7 @@ CMAKE_DEBUG_FLAGS ?= -DUSERVER_SANITIZE='addr ub'
 CMAKE_RELEASE_FLAGS ?=
 CMAKE_OS_FLAGS ?= -DUSERVER_FEATURE_CRYPTOPP_BLAKE2=0 -DUSERVER_FEATURE_REDIS_HI_MALLOC=1
 NPROCS ?= $(shell nproc)
+CLANG_FORMAT ?= clang-format
 
 # NOTE: use Makefile.local for customization
 -include Makefile.local
@@ -44,7 +45,7 @@ dist-clean:
 # format
 .PHONY: format
 format:
-	@find src -name '*pp' -type f | xargs clang-format -i
+	@find src -name '*pp' -type f | xargs $(CLANG_FORMAT) -i
 	@find tests -name '*.py' -type f | xargs autopep8 -i
 
 .PHONY: cmake-debug build-debug test-debug clean-debug cmake-release build-release test-release clean-release install
