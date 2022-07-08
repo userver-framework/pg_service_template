@@ -49,7 +49,7 @@ format:
 	@find src -name '*pp' -type f | xargs $(CLANG_FORMAT) -i
 	@find tests -name '*.py' -type f | xargs autopep8 -i
 
-.PHONY: cmake-debug build-debug test-debug clean-debug cmake-release build-release test-release clean-release install install-debug
+.PHONY: cmake-debug build-debug test-debug clean-debug cmake-release build-release test-release clean-release install install-debug docker-start-service-debug docker-start-service docker-clean-data 
 
 install-debug: build-debug
 	@cd build_debug && \
@@ -72,8 +72,6 @@ install: build-release
 	@psql 'postgresql://user:password@service-postgres:5432/pg_service_template_db-1' -f ./postgresql/data/initial_data.sql
 	@/home/user/.local/bin/pg_service_template \
 		--config /home/user/.local/etc/pg_service_template/static_config.yaml
-
-#.PHONY: docker-cmake-debug docker-build-debug docker-test-debug docker-clean-debug docker-cmake-release docker-build-release docker-test-release docker-clean-release docker-install docker-install-debug docker-start-service-debug docker-start-service docker-clean-data 
 
 # Start targets makefile in docker enviroment
 docker-%:
