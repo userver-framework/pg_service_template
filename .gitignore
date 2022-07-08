@@ -3,6 +3,8 @@ build*
 compile_commands.json
 .cache/
 .idea/
+.pgdata/
+.cores/
 cmake-build-*
 Testing/
 configs/static_config.yaml
