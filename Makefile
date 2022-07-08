@@ -1,4 +1,5 @@
 CMAKE_COMMON_FLAGS ?= -DUSERVER_OPEN_SOURCE_BUILD=1 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
 CMAKE_DEBUG_FLAGS ?= -DUSERVER_SANITIZE='addr ub'
 CMAKE_RELEASE_FLAGS ?=
 CMAKE_OS_FLAGS ?= -DUSERVER_FEATURE_CRYPTOPP_BLAKE2=0 -DUSERVER_FEATURE_REDIS_HI_MALLOC=1
@@ -49,7 +50,7 @@ format:
 	@find src -name '*pp' -type f | xargs $(CLANG_FORMAT) -i
 	@find tests -name '*.py' -type f | xargs autopep8 -i
 
-.PHONY: cmake-debug build-debug test-debug clean-debug cmake-release build-release test-release clean-release install install-debug docker-start-service-debug docker-start-service docker-clean-data 
+.PHONY: cmake-debug build-debug test-debug clean-debug cmake-release build-release test-release clean-release install install-debug docker-cmake-debug docker-build-debug docker-test-debug docker-clean-debug docker-cmake-release docker-build-release docker-test-release docker-clean-release docker-install docker-install-debug docker-start-service-debug docker-start-service docker-clean-data
 
 install-debug: build-debug
 	@cd build_debug && \
@@ -74,7 +75,7 @@ install: build-release
 		--config /home/user/.local/etc/pg_service_template/static_config.yaml
 
 # Start targets makefile in docker enviroment
-docker-%:
+docker-impl-%:
 	docker-compose run --rm pg_service_template-service make $*
 
 # Build and runs service in docker environment
@@ -102,3 +103,18 @@ test-release: test-impl-release
 
 clean-debug: clean-impl-debug
 clean-release: clean-impl-release
+
+docker-cmake-debug: docker-impl-cmake-debug
+docker-cmake-release: docker-impl-cmake-release
+
+docker-build-debug: docker-impl-build-debug
+docker-build-release: docker-impl-build-release
+
+docker-test-debug: docker-impl-test-debug
+docker-test-release: docker-impl-test-release
+
+docker-clean-debug: docker-impl-clean-debug
+docker-clean-release: docker-impl-clean-release
+
+docker-install: docker-impl-install
+docker-install-debug: docker-impl-install-debug
