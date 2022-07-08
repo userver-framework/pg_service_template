@@ -41,6 +41,7 @@ clean-impl-%:
 .PHONY: dist-clean
 dist-clean:
 	@rm -rf build_*
+	@rm -f ./configs/static_config.yaml
 
 # format
 .PHONY: format
@@ -48,11 +49,46 @@ format:
 	@find src -name '*pp' -type f | xargs $(CLANG_FORMAT) -i
 	@find tests -name '*.py' -type f | xargs autopep8 -i
 
-.PHONY: cmake-debug build-debug test-debug clean-debug cmake-release build-release test-release clean-release install
+.PHONY: cmake-debug build-debug test-debug clean-debug cmake-release build-release test-release clean-release install install-debug docker-start-service-debug docker-start-service docker-clean-data 
+
+install-debug: build-debug
+	@cd build_debug && \
+		cmake --install . -v --component pg_service_template
 
 install: build-release
 	@cd build_release && \
 		cmake --install . -v --component pg_service_template
+
+# Hide target, use only in docker environment
+--debug-start-in-docker: install
+	@sed -i 's/config_vars.yaml/config_vars.docker.yaml/g' /home/user/.local/etc/pg_service_template/static_config.yaml
+	@psql 'postgresql://user:password@service-postgres:5432/pg_service_template_db-1' -f ./postgresql/data/initial_data.sql
+	@/home/user/.local/bin/pg_service_template \
+		--config /home/user/.local/etc/pg_service_template/static_config.yaml
+
+# Hide target, use only in docker environment
+--debug-start-in-docker-debug: install-debug
+	@sed -i 's/config_vars.yaml/config_vars.docker.yaml/g' /home/user/.local/etc/pg_service_template/static_config.yaml
+	@psql 'postgresql://user:password@service-postgres:5432/pg_service_template_db-1' -f ./postgresql/data/initial_data.sql
+	@/home/user/.local/bin/pg_service_template \
+		--config /home/user/.local/etc/pg_service_template/static_config.yaml
+
+# Start targets makefile in docker enviroment
+docker-%:
+	docker-compose run --rm pg_service_template-service make $*
+
+# Build and runs service in docker environment
+docker-start-service-debug:
+	@docker-compose run -p 8080:8080 --rm pg_service_template-service make -- --debug-start-in-docker-debug
+
+# Build and runs service in docker environment
+docker-start-service:
+	@docker-compose run -p 8080:8080 --rm pg_service_template-service make -- --debug-start-in-docker
+
+# Stop docker container and remove PG data
+docker-clean-data:
+	@docker-compose down -v
+	@rm -rf ./.pgdata
 
 # Explicitly specifying the targets to help shell with completions
 cmake-debug: build_debug/Makefile

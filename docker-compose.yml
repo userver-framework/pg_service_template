@@ -1,0 +1,54 @@
+version: "2.3"
+
+services:
+    postgres:
+        container_name: service-postgres
+        image: postgres:12
+        environment:
+          - POSTGRES_DB=pg_service_template_db-1
+          - POSTGRES_USER=user
+          - POSTGRES_PASSWORD=password
+        ports:
+          - 5432
+        volumes:
+          - ./postgresql/schemas:/docker-entrypoint-initdb.d
+          - ./.pgdata:/var/lib/postgresql/data
+        networks:
+          - postgres
+
+    pg_service_template-service:
+        image: ghcr.io/userver-framework/docker-userver-build-base:release
+        privileged: true
+        environment:
+          - POSTGRES_DB=pg_service_template_db-1
+          - POSTGRES_USER=user
+          - POSTGRES_PASSWORD=password
+          - PREFIX=${PREFIX:-~/.local}
+          - CC
+          - CCACHE_DIR=/ccache
+          - CCACHE_HASHDIR
+          - CCACHE_NOHASHDIR
+          - CCACHE_PREFIX
+          - CCACHE_SIZE
+          - CMAKE_OPTS
+          - CORES_DIR=/cores
+          - CXX
+          - MAKE_OPTS
+        volumes:
+          - .:/pg_service_template:rw
+          - ./third_party/userver/tools/docker:/tools:ro
+          - ${CCACHE_DIR:-~/.ccache}:/ccache:rw
+          - ${TC_CORES_DIR:-./.cores}:/cores:rw
+        ports:
+          - 8080:8080
+        working_dir: /pg_service_template
+        entrypoint:
+          - /tools/run_as_user.sh
+        depends_on:
+          - postgres
+        networks:
+          - postgres
+
+networks:
+    postgres:
+        driver: bridge
