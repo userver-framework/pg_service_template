@@ -25,7 +25,7 @@ services:
           - POSTGRES_PASSWORD=password
           - PREFIX=${PREFIX:-~/.local}
           - CC
-          - CCACHE_DIR=/ccache
+          - CCACHE_DIR=/pg_service_template/.ccache
           - CCACHE_HASHDIR
           - CCACHE_NOHASHDIR
           - CCACHE_PREFIX
@@ -37,7 +37,6 @@ services:
         volumes:
           - .:/pg_service_template:rw
           - ./third_party/userver/tools/docker:/tools:ro
-          - ${CCACHE_DIR:-~/.ccache}:/ccache:rw
           - ${TC_CORES_DIR:-./.cores}:/cores:rw
         ports:
           - 8080:8080

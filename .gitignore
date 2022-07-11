@@ -2,6 +2,7 @@ __pycache__
 build*
 compile_commands.json
 .cache/
+.ccache/
 .idea/
 .pgdata/
 .cores/
