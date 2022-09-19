@@ -38,8 +38,7 @@ test-impl-%: build-impl-%
 
 # testsuite service runner
 service-impl-start-%: build-impl-%
-	./build_$*/tests/runtests-pg_service_template-testsuite \
-		--service-runner-mode -vvs ./tests
+	@cd ./build_$* && make start-pg_service_template
 
 # clean
 clean-impl-%:
