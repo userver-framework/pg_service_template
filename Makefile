@@ -38,7 +38,7 @@ test-impl-%: build-impl-%
 
 # testsuite service runner
 service-impl-start-%: build-impl-%
-	@cd ./build_$* && make start-pg_service_template
+	@cd ./build_$* && $(MAKE) start-pg_service_template
 
 # clean
 clean-impl-%:
