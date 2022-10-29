@@ -33,6 +33,7 @@
       }
     }
   },
+  "POSTGRES_CONNECTION_PIPELINE_ENABLED": false,
   "POSTGRES_CONNECTION_POOL_SETTINGS": {
     "postgres-db-1": {
       "max_pool_size": 15,
