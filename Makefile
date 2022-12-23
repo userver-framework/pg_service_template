@@ -1,5 +1,4 @@
 CMAKE_COMMON_FLAGS ?= -DUSERVER_OPEN_SOURCE_BUILD=1 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-
 CMAKE_DEBUG_FLAGS ?= -DUSERVER_SANITIZE='addr ub'
 CMAKE_RELEASE_FLAGS ?=
 CMAKE_OS_FLAGS ?= -DUSERVER_FEATURE_CRYPTOPP_BLAKE2=0 -DUSERVER_FEATURE_REDIS_HI_MALLOC=1
@@ -9,6 +8,7 @@ CLANG_FORMAT ?= clang-format
 # NOTE: use Makefile.local for customization
 -include Makefile.local
 
+.PHONY: all
 all: test-debug test-release
 
 # Debug cmake configuration
@@ -25,105 +25,72 @@ build_release/Makefile:
 	@cd build_release && \
       cmake -DCMAKE_BUILD_TYPE=Release $(CMAKE_COMMON_FLAGS) $(CMAKE_RELEASE_FLAGS) $(CMAKE_OS_FLAGS) $(CMAKE_OPTIONS) ..
 
-# build using cmake
-build-impl-%: build_%/Makefile
+# Run cmake
+.PHONY: cmake-debug cmake-release
+cmake-debug cmake-release: cmake-%: build_%/Makefile
+
+# Build using cmake
+.PHONY: build-debug build-release
+build-debug build-release: build-%: cmake-%
 	@cmake --build build_$* -j $(NPROCS) --target pg_service_template
 
-# test
-test-impl-%: build-impl-%
+# Test
+.PHONY: test-debug test-release
+test-debug test-release: test-%: build-%
 	@cmake --build build_$* -j $(NPROCS) --target pg_service_template_unittest
 	@cmake --build build_$* -j $(NPROCS) --target pg_service_template_benchmark
 	@cd build_$* && ((test -t 1 && GTEST_COLOR=1 PYTEST_ADDOPTS="--color=yes" ctest -V) || ctest -V)
 	@pep8 tests
 
-# testsuite service runner
-service-impl-start-%: build-impl-%
+# Start the service (via testsuite service runner)
+.PHONY: service-start-debug service-start-release
+service-start-debug service-start-release: service-start-%: build-%
 	@cd ./build_$* && $(MAKE) start-pg_service_template
 
-# clean
-clean-impl-%:
+# Cleanup data
+.PHONY: clean-debug clean-release
+clean-debug clean-release: clean-%:
 	cd build_$* && $(MAKE) clean
 
-# dist-clean
 .PHONY: dist-clean
 dist-clean:
 	@rm -rf build_*
 	@rm -f ./configs/static_config.yaml
 
-# format
+# Install
+.PHONY: install-debug install-release
+install-debug install-release: install-%: build-%
+	@cd build_$* && \
+		cmake --install . -v --component pg_service_template
+
+.PHONY: install
+install: install-release
+
+# Format the sources
 .PHONY: format
 format:
 	@find src -name '*pp' -type f | xargs $(CLANG_FORMAT) -i
 	@find tests -name '*.py' -type f | xargs autopep8 -i
 
-.PHONY: cmake-debug build-debug test-debug clean-debug cmake-release build-release test-release clean-release install install-debug docker-cmake-debug docker-build-debug docker-test-debug docker-clean-debug docker-cmake-release docker-build-release docker-test-release docker-clean-release docker-install docker-install-debug docker-start-service-debug docker-start-service docker-clean-data
-
-install-debug: build-debug
-	@cd build_debug && \
-		cmake --install . -v --component pg_service_template
-
-install: build-release
-	@cd build_release && \
-		cmake --install . -v --component pg_service_template
-
-# Hide target, use only in docker environment
---debug-start-in-docker: install
+# Internal hidden targets that are used only in docker environment
+--in-docker-start-debug --in-docker-start-release: --in-docker-start-%: install-%
 	@sed -i 's/config_vars.yaml/config_vars.docker.yaml/g' /home/user/.local/etc/pg_service_template/static_config.yaml
 	@psql 'postgresql://user:password@service-postgres:5432/pg_service_template_db-1' -f ./postgresql/data/initial_data.sql
 	@/home/user/.local/bin/pg_service_template \
 		--config /home/user/.local/etc/pg_service_template/static_config.yaml
 
-# Hide target, use only in docker environment
---debug-start-in-docker-debug: install-debug
-	@sed -i 's/config_vars.yaml/config_vars.docker.yaml/g' /home/user/.local/etc/pg_service_template/static_config.yaml
-	@psql 'postgresql://user:password@service-postgres:5432/pg_service_template_db-1' -f ./postgresql/data/initial_data.sql
-	@/home/user/.local/bin/pg_service_template \
-		--config /home/user/.local/etc/pg_service_template/static_config.yaml
+# Build and run service in docker environment
+.PHONY: docker-start-service-debug docker-start-service-release
+docker-start-service-debug docker-start-service-release: docker-start-service-%:
+	@docker-compose run -p 8080:8080 --rm pg_service_template-container $(MAKE) -- --in-docker-start-$*
 
-# Start targets makefile in docker enviroment
-docker-impl-%:
-	docker-compose run --rm pg_service_template-service make $*
-
-# Build and runs service in docker environment
-docker-start-service-debug:
-	@docker-compose run -p 8080:8080 --rm pg_service_template-service make -- --debug-start-in-docker-debug
-
-# Build and runs service in docker environment
-docker-start-service:
-	@docker-compose run -p 8080:8080 --rm pg_service_template-service make -- --debug-start-in-docker
+# Start targets makefile in docker environment
+.PHONY: docker-cmake-debug docker-build-debug docker-test-debug docker-clean-debug docker-install-debug docker-cmake-release docker-build-release docker-test-release docker-clean-release docker-install-release
+docker-cmake-debug docker-build-debug docker-test-debug docker-clean-debug docker-install-debug docker-cmake-release docker-build-release docker-test-release docker-clean-release docker-install-release: docker-%:
+	docker-compose run --rm pg_service_template-container $(MAKE) $*
 
 # Stop docker container and remove PG data
+.PHONY: docker-clean-data
 docker-clean-data:
 	@docker-compose down -v
 	@rm -rf ./.pgdata
-
-# Explicitly specifying the targets to help shell with completions
-cmake-debug: build_debug/Makefile
-cmake-release: build_release/Makefile
-
-build-debug: build-impl-debug
-build-release: build-impl-release
-
-test-debug: test-impl-debug
-test-release: test-impl-release
-
-service-start-debug: service-impl-start-debug
-service-start-release: service-impl-start-release
-
-clean-debug: clean-impl-debug
-clean-release: clean-impl-release
-
-docker-cmake-debug: docker-impl-cmake-debug
-docker-cmake-release: docker-impl-cmake-release
-
-docker-build-debug: docker-impl-build-debug
-docker-build-release: docker-impl-build-release
-
-docker-test-debug: docker-impl-test-debug
-docker-test-release: docker-impl-test-release
-
-docker-clean-debug: docker-impl-clean-debug
-docker-clean-release: docker-impl-clean-release
-
-docker-install: docker-impl-install
-docker-install-debug: docker-impl-install-debug
