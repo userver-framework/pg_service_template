@@ -87,7 +87,7 @@ docker-start-service-debug docker-start-service-release: docker-start-service-%:
 # Start targets makefile in docker environment
 .PHONY: docker-cmake-debug docker-build-debug docker-test-debug docker-clean-debug docker-install-debug docker-cmake-release docker-build-release docker-test-release docker-clean-release docker-install-release
 docker-cmake-debug docker-build-debug docker-test-debug docker-clean-debug docker-install-debug docker-cmake-release docker-build-release docker-test-release docker-clean-release docker-install-release: docker-%:
-	docker-compose run --rm service_template $(MAKE) $*
+	docker-compose run --rm pg_service_template $(MAKE) $*
 
 # Stop docker container and remove PG data
 .PHONY: docker-clean-data
