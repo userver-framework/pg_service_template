@@ -16,7 +16,7 @@ services:
         networks:
           - postgres
 
-    pg_service_template:
+    pg_service_template-container:
         image: ghcr.io/userver-framework/docker-userver-build-base:v1a
         privileged: true
         environment:
