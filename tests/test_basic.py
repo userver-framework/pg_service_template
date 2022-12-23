@@ -29,7 +29,7 @@ async def test_db_updates(service_client):
     assert response.text == 'Hi again, World!\n'
 
 
-@pytest.mark.pgsql('db-1', files=['initial_data.sql'])
+@pytest.mark.pgsql('db_1', files=['initial_data.sql'])
 async def test_db_initial_data(service_client):
     response = await service_client.post(
         '/v1/hello',
