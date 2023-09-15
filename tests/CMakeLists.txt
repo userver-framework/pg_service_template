@@ -1,4 +1,4 @@
-include(UserverTestsuite)
+include(${userver_SOURCE_DIR}/cmake/UserverTestsuite.cmake)
 
 set(CONFIG_VARS_PATH "${CMAKE_SOURCE_DIR}/configs/config_vars_testing.yaml")
 if (EXISTS "${CONFIG_VARS_PATH}")

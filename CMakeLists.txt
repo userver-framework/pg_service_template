@@ -1,11 +1,14 @@
 cmake_minimum_required(VERSION 3.12)
 project(pg_service_template CXX)
 
-include(third_party/userver/cmake/SetupEnvironment.cmake)
+include(cmake/CPM.cmake)
 include(GNUInstallDirs)
 
-add_subdirectory(third_party/userver)
-
+CPMAddPackage(
+    NAME userver
+    GITHUB_REPOSITORY userver-framework/userver
+    GIT_TAG 1261055
+)
 
 # Common sources
 add_library(${PROJECT_NAME}_objs OBJECT
@@ -13,11 +16,13 @@ add_library(${PROJECT_NAME}_objs OBJECT
     src/hello.cpp
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver-core userver-postgresql)
+target_compile_features(${PROJECT_NAME}_objs PRIVATE cxx_std_17)
 
 
 # The Service
 add_executable(${PROJECT_NAME} src/main.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_objs)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 
 # Unit Tests
@@ -25,6 +30,7 @@ add_executable(${PROJECT_NAME}_unittest
     src/hello_test.cpp
 )
 target_link_libraries(${PROJECT_NAME}_unittest PRIVATE ${PROJECT_NAME}_objs userver-utest)
+target_compile_features(${PROJECT_NAME}_unittest PRIVATE cxx_std_17)
 add_google_tests(${PROJECT_NAME}_unittest)
 
 
@@ -33,6 +39,7 @@ add_executable(${PROJECT_NAME}_benchmark
 	src/hello_benchmark.cpp
 )
 target_link_libraries(${PROJECT_NAME}_benchmark PRIVATE ${PROJECT_NAME}_objs userver-ubench)
+target_compile_features(${PROJECT_NAME}_benchmark PRIVATE cxx_std_17)
 add_google_benchmark_tests(${PROJECT_NAME}_benchmark)
 
 # Functional Tests
