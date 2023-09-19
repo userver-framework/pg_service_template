@@ -56,7 +56,8 @@ clean-debug clean-release: clean-%:
 .PHONY: dist-clean
 dist-clean:
 	@rm -rf build_*
-	@rm -f ./configs/static_config.yaml
+	@rm -f ./configs/config_vars.docker.yaml
+	@rm -f ./configs/config_vars.yaml
 	@rm -rf tests/__pycache__/
 	@rm -rf tests/.pytest_cache/
 
