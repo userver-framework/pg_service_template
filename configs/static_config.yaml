@@ -22,9 +22,6 @@ components_manager:
                     level: $logger-level
                     overflow_behavior: discard  # Drop logs if the system is too busy to write them down.
 
-        tracer:                              # Component that helps to trace execution times and requests in logs.
-            service-name: pg_service_template   # "You know. You all know exactly who I am. Say my name. " (c)
-
         # Dynamic config options. Cache is disabled, updates are disabled.
         dynamic-config:
             # For most of userver dynamic configs, defaults are used, some are overridden here.
