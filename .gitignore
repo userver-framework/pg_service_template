@@ -9,5 +9,3 @@ compile_commands.json
 .cores/
 cmake-build-*
 Testing/
-configs/config_vars.yaml
-configs/config_vars.docker.yaml
