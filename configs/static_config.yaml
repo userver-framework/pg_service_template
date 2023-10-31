@@ -32,6 +32,8 @@ components_manager:
                     network_timeout_ms: 750
                     statement_timeout_ms: 500
 
+        testsuite-support: {}
+
         http-client:
             load-enabled: $is-testing
             fs-task-processor: fs-task-processor
