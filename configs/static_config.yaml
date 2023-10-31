@@ -1,5 +1,3 @@
-# yaml
-
 components_manager:
     task_processors:                  # Task processor is an executor for coroutine tasks
 
