@@ -7,5 +7,3 @@ is-testing: false
 server-port: 8080
 
 dbconnection: 'postgresql://pg_service_template_user:password@localhost:5432/pg_service_template_db_1'
-
-config-fallback-path: @CONFIG_FALLBACK_PATH@
