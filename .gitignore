@@ -2,10 +2,12 @@ __pycache__
 build*
 compile_commands.json
 .cache/
-.ccache/
 .idea/
 .vscode/
-.pgdata/
 .cores/
+.ccache/
+.pgdata/
 cmake-build-*
 Testing/
+.DS_Store
+Makefile.local
