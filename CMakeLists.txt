@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.12)
 project(pg_service_template CXX)
 
+# Enable userver libraries that are needed in this project
+set(USERVER_FEATURE_MONGODB ON CACHE BOOL "" FORCE)
+
 # Compatibility mode: some systems don't support these features
 set(USERVER_FEATURE_CRYPTOPP_BLAKE2 OFF CACHE BOOL "" FORCE)
 set(USERVER_FEATURE_GRPC_CHANNELZ OFF CACHE BOOL "" FORCE)
