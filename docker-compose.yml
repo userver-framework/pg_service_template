@@ -17,7 +17,7 @@ services:
           - postgres
 
     pg_service_template-container:
-        image: ghcr.io/userver-framework/ubuntu-22.04-userver-base-ci:latest
+        image: ghcr.io/userver-framework/ubuntu-22.04-userver-pg:latest
         privileged: true
         environment:
           - POSTGRES_DB=pg_service_template_db-1
@@ -28,13 +28,12 @@ services:
           - CORES_DIR=/cores
         volumes:
           - .:/pg_service_template:rw
-          - ./third_party/userver/scripts/docker/:/tools:ro
           - ${TC_CORES_DIR:-./.cores}:/cores:rw
         ports:
           - 8080:8080
         working_dir: /pg_service_template
         entrypoint:
-          - /tools/run_as_user.sh
+          - ./tests/run_as_user.sh
         depends_on:
           - postgres
         networks:
