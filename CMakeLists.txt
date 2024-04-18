@@ -3,7 +3,7 @@ project(pg_service_template CXX)
 
 
 # Adding userver dependency
-find_package(userver COMPONENTS core grpc postgresql QUIET)
+find_package(userver COMPONENTS core postgresql QUIET)
 if(NOT userver_FOUND)  # Fallback to subdirectory usage
     # Enable userver libraries that are needed in this project
     set(USERVER_FEATURE_POSTGRESQL ON CACHE BOOL "" FORCE)
