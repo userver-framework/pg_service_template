@@ -54,8 +54,6 @@ add_google_benchmark_tests(${PROJECT_NAME}_benchmark)
 
 
 # Functional Tests
-include(UserverTestsuite)
-
 userver_testsuite_add_simple()
 
 
