@@ -44,7 +44,7 @@ jobs:
 
           - name: Install packages
             run: |
-              DEPS_FILE="https://raw.githubusercontent.com/userver-framework/userver/refs/heads/develop/scripts/docs/en/deps/${{matrix.os}}.md"
+                DEPS_FILE="https://raw.githubusercontent.com/userver-framework/userver/refs/heads/develop/scripts/docs/en/deps/${{matrix.os}}.md"
                 sudo apt update
                 sudo apt install --allow-downgrades -y postgresql $(wget -q -O - ${DEPS_FILE})
                 python3 -m pip install -r requirements.txt
