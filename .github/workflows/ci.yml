@@ -44,9 +44,9 @@ jobs:
 
           - name: Install packages
             run: |
-                (cd third_party && git clone -b develop --single-branch --depth 1 https://github.com/userver-framework/userver.git)
+              DEPS_FILE="https://raw.githubusercontent.com/userver-framework/userver/refs/heads/develop/scripts/docs/en/deps/${{matrix.os}}.md"
                 sudo apt update
-                sudo apt install --allow-downgrades -y postgresql $(cat third_party/userver/scripts/docs/en/deps/${{matrix.os}}.md | tr '\n' ' ')
+                sudo apt install --allow-downgrades -y postgresql $(wget -q -O - ${DEPS_FILE})
                 python3 -m pip install -r requirements.txt
 
           - name: Reinstall postgres 14
