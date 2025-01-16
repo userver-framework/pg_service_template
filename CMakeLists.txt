@@ -4,7 +4,7 @@ project(pg_service_template CXX)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(DownloadUserver)
 
-find_package(userver COMPONENTS core QUIET)
+find_package(userver COMPONENTS core postgresql QUIET)
 if(NOT userver_FOUND)
   # Tries TRY_DIR first, falls back to downloading userver from GitHub using CPM.
   download_userver(TRY_DIR third_party/userver)
