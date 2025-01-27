@@ -9,7 +9,7 @@
 #include <userver/storages/postgres/component.hpp>
 #include <userver/utils/assert.hpp>
 
-namespace pg_service_template {
+namespace service_template {
 
 namespace {
 
@@ -45,7 +45,7 @@ class Hello final : public userver::server::handlers::HttpHandlerBase {
       }
     }
 
-    return pg_service_template::SayHelloTo(name, user_type);
+    return service_template::SayHelloTo(name, user_type);
   }
 
   userver::storages::postgres::ClusterPtr pg_cluster_;
@@ -74,4 +74,4 @@ void AppendHello(userver::components::ComponentList& component_list) {
   component_list.Append<userver::clients::dns::Component>();
 }
 
-}  // namespace pg_service_template
+}  // namespace service_template

@@ -5,7 +5,7 @@ services:
         container_name: service-postgres
         image: postgres:12
         environment: &db_env
-          POSTGRES_DB: pg_service_template_db_1
+          POSTGRES_DB: service_template_db_1
           POSTGRES_USER: user
           POSTGRES_PASSWORD: password
         ports:
@@ -16,20 +16,20 @@ services:
         networks:
           - postgres
 
-    pg_service_template-container:
+    service_template-container:
         image: ghcr.io/userver-framework/ubuntu-22.04-userver-pg:latest
         privileged: true
         environment:
           <<: *db_env
           PREFIX: ${PREFIX:-~/.local}
-          CCACHE_DIR: /pg_service_template/.ccache
+          CCACHE_DIR: /service_template/.ccache
           CORES_DIR: /cores
         volumes:
-          - .:/pg_service_template:rw
+          - .:/service_template:rw
           - ${TC_CORES_DIR:-./.cores}:/cores:rw
         ports:
           - 8080:8080
-        working_dir: /pg_service_template
+        working_dir: /service_template
         entrypoint:
           - ./tests/run_as_user.sh
         depends_on:

@@ -6,4 +6,4 @@ is-testing: false
 
 server-port: 8080
 
-dbconnection: 'postgresql://pg_service_template_user:password@localhost:5432/pg_service_template_db_1'
+dbconnection: 'postgresql://service_template_user:password@localhost:5432/service_template_db_1'
