@@ -73,7 +73,7 @@ $(addprefix --in-docker-start-, $(PRESETS)): --in-docker-start-%: install-%
 # Build and run service in docker environment
 .PHONY: $(addprefix docker-start-, $(PRESETS))
 docker-start-debug docker-start-release: docker-start-%:
-	$(DOCKER_COMPOSE) run -p 8080:8080 --rm service_template-container make -- --in-docker-start-$*
+	$(DOCKER_COMPOSE) run -p 8080:8080 --rm $(PROJECT_NAME)-container make -- --in-docker-start-$*
 
 # Start targets makefile in docker environment
 .PHONY: $(addprefix docker-cmake-, $(PRESETS)) $(addprefix docker-build-, $(PRESETS)) $(addprefix docker-test-, $(PRESETS)) $(addprefix docker-clean-, $(PRESETS)) $(addprefix docker-install-, $(PRESETS))
