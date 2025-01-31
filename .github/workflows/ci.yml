@@ -17,11 +17,11 @@ jobs:
             fail-fast: false
             matrix:
                 include:
-                  - os: ubuntu-22.04
+                  - os: ubuntu-24.04
                     make: test-debug
                     info: g++-11 + test-debug
 
-                  - os: ubuntu-22.04
+                  - os: ubuntu-24.04
                     make: test-release
                     info: g++-11 + test-release
 
@@ -52,7 +52,7 @@ jobs:
           - name: Reinstall postgres 14
             run: |
                 sudo apt purge libpq5 libpq-dev postgresql-*
-                sudo apt install -y postgresql-14 postgresql-client-14 postgresql-server-dev-14
+                sudo apt install -y postgresql-16 postgresql-client-16 postgresql-server-dev-16
 
           - name: Setup ccache
             run: |

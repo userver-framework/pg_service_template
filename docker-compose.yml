@@ -17,7 +17,7 @@ services:
           - postgres
 
     service_template-container:
-        image: ghcr.io/userver-framework/ubuntu-22.04-userver-pg:latest
+        image: ghcr.io/userver-framework/ubuntu-24.04-userver:latest
         privileged: true
         environment:
           <<: *db_env
