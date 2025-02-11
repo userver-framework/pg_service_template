@@ -1,7 +1,9 @@
 PROJECT_NAME = service_template
 NPROCS ?= $(shell nproc)
 CLANG_FORMAT ?= clang-format
-DOCKER_COMPOSE ?= docker-compose
+DOCKER_IMAGE ?= ghcr.io/userver-framework/ubuntu-24.04-userver:latest
+# If we're under TTY, pass "-it" to "docker run"
+DOCKER_ARGS = $(shell /bin/test -t 0 && /bin/echo -it || echo)
 PRESETS ?= debug release debug-custom release-custom
 
 .PHONY: all
@@ -59,29 +61,17 @@ format:
 	find src -name '*pp' -type f | xargs $(CLANG_FORMAT) -i
 	find tests -name '*.py' -type f | xargs autopep8 -i
 
-# Set environment for --in-docker-start
-export DB_CONNECTION := postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@service-postgres:5432/${POSTGRES_DB}
-
-# Internal hidden targets that are used only in docker environment
-.PHONY: $(addprefix --in-docker-start-, $(PRESETS))
-$(addprefix --in-docker-start-, $(PRESETS)): --in-docker-start-%: install-%
-	psql ${DB_CONNECTION} -f ./postgresql/data/initial_data.sql
-	/home/user/.local/bin/$(PROJECT_NAME) \
-		--config /home/user/.local/etc/$(PROJECT_NAME)/static_config.yaml \
-		--config_vars /home/user/.local/etc/$(PROJECT_NAME)/config_vars.docker.yaml
-
-# Build and run service in docker environment
-.PHONY: $(addprefix docker-start-, $(PRESETS))
-$(addprefix docker-start-, $(PRESETS)): docker-start-%:
-	$(DOCKER_COMPOSE) run -p 8080:8080 --rm $(PROJECT_NAME)-container make -- --in-docker-start-$*
-
-# Start targets makefile in docker environment
-.PHONY: $(addprefix docker-cmake-, $(PRESETS)) $(addprefix docker-build-, $(PRESETS)) $(addprefix docker-test-, $(PRESETS)) $(addprefix docker-clean-, $(PRESETS)) $(addprefix docker-install-, $(PRESETS))
-$(addprefix docker-cmake-, $(PRESETS)) $(addprefix docker-build-, $(PRESETS)) $(addprefix docker-test-, $(PRESETS)) $(addprefix docker-clean-, $(PRESETS)) $(addprefix docker-install-, $(PRESETS)): docker-%:
-	$(DOCKER_COMPOSE) run --rm $(PROJECT_NAME)-container make $*
-
-# Stop docker container and remove PG data
-.PHONY: docker-clean-data
-docker-clean-data:
-	$(DOCKER_COMPOSE) down -v
-	rm -rf ./.pgdata
+# Start targets makefile in docker wrapper.
+# The docker mounts the whole service's source directory,
+# so you can do some stuff as you wish, switch back to host (non-docker) system
+# and still able to access the results.
+.PHONY: $(addprefix docker-cmake-, $(PRESETS)) $(addprefix docker-build-, $(PRESETS)) $(addprefix docker-test-, $(PRESETS)) $(addprefix docker-clean-, $(PRESETS))
+$(addprefix docker-cmake-, $(PRESETS)) $(addprefix docker-build-, $(PRESETS)) $(addprefix docker-test-, $(PRESETS)) $(addprefix docker-clean-, $(PRESETS)): docker-%:
+	docker run $(DOCKER_ARGS) \
+		--network=host \
+		-v $$PWD:$$PWD \
+		-w $$PWD \
+		$(DOCKER_IMAGE) \
+		env CCACHE_DIR=$$PWD/.ccache \
+		    HOME=$$HOME \
+		    $$PWD/run_as_user.sh $(shell /bin/id -u) $(shell /bin/id -g) make $*
